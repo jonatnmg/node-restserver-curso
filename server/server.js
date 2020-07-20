@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //importar las rutas
-app.use(require('./routes/usuario'));
+app.use(require('./routes/index'));
 
 // parse application/json
 app.use(bodyParser.json())

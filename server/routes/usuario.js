@@ -2,17 +2,20 @@ const express = require('express');
 const app = express();
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
-const _ = require('underscore');
+const _ = require('underscore'); //extension de funciones para javaScript
+
+//importar mi middleware
+const { verificarToken, verificaAdmin_Role } = require('../middlewares/autenticacion');
 
 //Obtener
-app.get('/usuario', function (req, res) {
+app.get('/usuario', verificarToken, function (req, res) {
     let desde = req.query.desde || 0;
     desde = Number(desde);
 
     let limite = req.query.limite || 5;
     limite = Number(limite);
 
-    Usuario.find({estado: true}, 'nombre email role estado google img')
+    Usuario.find({ estado: true }, 'nombre email role estado google img')
         .skip(desde)
         .limit(limite)
         .exec((err, usuarios) => {
@@ -23,7 +26,7 @@ app.get('/usuario', function (req, res) {
                 });
             }
 
-            Usuario.count({estado: true}, (err, conteo) => {
+            Usuario.count({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
                     usuarios,
@@ -34,7 +37,7 @@ app.get('/usuario', function (req, res) {
 });
 
 //Crear nuevo registro
-app.post('/usuario', (req, res) => {
+app.post('/usuario', [verificarToken, verificaAdmin_Role], (req, res) => {
     let body = req.body;
 
     //Usamos la clase (esquema mongoose)
@@ -63,7 +66,7 @@ app.post('/usuario', (req, res) => {
 });
 
 //Modificar un registro
-app.put('/usuario/:id', (req, res) => {
+app.put('/usuario/:id', [verificarToken, verificaAdmin_Role], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
 
@@ -84,46 +87,13 @@ app.put('/usuario/:id', (req, res) => {
     })
 });
 
-app.get('/usuario', (req, res) => {
-    res.json('get Usuario Local');
-});
-
-app.delete('/usuario/:id', (req, res) => {
+app.delete('/usuario/:id', verificarToken, (req, res) => {
     let id = req.params.id;
-
-    /*
-    Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
-        
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
-
-        if(!usuarioBorrado) {
-            return res.status(400).json({
-                ok: false,
-                error: {
-                    message: 'Usuario no encontrado'
-                }
-            }); 
-        }
-
-        res.json({
-            ok: true,
-            usuario: usuarioBorrado
-        });
-
-    });
-    */
-
-
     let cambiaEstado = {
         estado: false
     }
 
-    Usuario.findByIdAndUpdate(id, cambiaEstado , { new: true }, (err, usuarioBorrado) => {
+    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true }, (err, usuarioBorrado) => {
 
         if (err) {
             return res.status(400).json({
@@ -132,13 +102,13 @@ app.delete('/usuario/:id', (req, res) => {
             });
         }
 
-        if(!usuarioBorrado) {
+        if (!usuarioBorrado) {
             return res.status(400).json({
                 ok: false,
                 error: {
                     message: 'Usuario no encontrado'
                 }
-            }); 
+            });
         }
 
         res.json({
