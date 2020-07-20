@@ -1,45 +1,40 @@
-require('./config/config');
-const express = require('express')
-const app = express()
+require('./config/config'); //Configuración variables globales o de entorno
+const express = require('express');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 
+const app = express();
+
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
+
+//importar las rutas
+app.use(require('./routes/usuario'));
 
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/', function (req, res) {
-    res.json('Hello World')
-});
-
-app.post('/usuario', (req, res) => {
-    let persona = req.body;
-    
-    if (persona.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es necesario'
-        });
-    } else {
-        res.json({ persona });
-    }
-
-})
-
-app.put('/usuario/:id', (req, res) => {
-    let id = req.params.id;
-
-    res.json({ id });
-})
-
-app.get('/usuario', (req, res) => {
-    res.json('get Usuario');
-})
-
-app.delete('/usuario', (req, res) => {
-    res.json('delete Usuario');
-})
+/*
+mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
+    if( err)
+        throw new err;
+    else
+    console.log('Base de datos online');
+});*/
+try {
+    mongoose.connect(process.env.URLDB, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true
+    }, (err, res) => {
+        if (err)
+            throw new err;
+        else
+            console.log('Base de datos online');
+    }); 
+} catch (error) {
+    throw new error;
+}
 
 app.listen(process.env.PORT, () => {
     console.log(`Escuchando puerto: ${process.env.PORT}`)
