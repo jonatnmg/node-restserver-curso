@@ -1,7 +1,8 @@
 require('./config/config'); //Configuración variables globales o de entorno
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 
@@ -13,6 +14,11 @@ app.use(require('./routes/index'));
 
 // parse application/json
 app.use(bodyParser.json())
+
+//Habilitar la carpeta public
+app.use(express.static(path.resolve(__dirname , '../public')));
+
+
 
 /*
 mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
@@ -31,7 +37,7 @@ try {
             throw new err;
         else
             console.log('Base de datos online');
-    }); 
+    });
 } catch (error) {
     throw new error;
 }
