@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 
-// parse application/x-www-form-urlencoded
+//parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //importar las rutas
@@ -18,15 +18,6 @@ app.use(bodyParser.json())
 //Habilitar la carpeta public
 app.use(express.static(path.resolve(__dirname , '../public')));
 
-
-
-/*
-mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
-    if( err)
-        throw new err;
-    else
-    console.log('Base de datos online');
-});*/
 try {
     mongoose.connect(process.env.URLDB, {
         useNewUrlParser: true,

@@ -6,7 +6,7 @@ let rolesValidos = {
     values: ['ADMIN_ROLE', 'USER_ROLE'],
     message: '{VALUE} no es un rol válido'
 }
-let usuarioSechema = new Schema({
+let usuarioSchema = new Schema({
     nombre: {
         type: String,
         required: [true, 'El nombre es necesario']
@@ -39,12 +39,12 @@ let usuarioSechema = new Schema({
     }
 });
 
-usuarioSechema.methods.toJSON = function() {
+usuarioSchema.methods.toJSON = function() {
     let user = this;
     let userObject = user.toObject();
     delete userObject.password;
 
     return userObject;
 }
-usuarioSechema.plugin(uniqueValidator, { message: '{PATH} debe ser único' })
-module.exports = mongoose.model('usuario', usuarioSechema);
+usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe ser único' })
+module.exports = mongoose.model('usuario', usuarioSchema);
